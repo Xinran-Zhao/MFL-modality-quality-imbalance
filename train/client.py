@@ -72,6 +72,11 @@ def local_train(
     sums = {"loss_total": 0.0, "loss_cls": 0.0, "loss_contrast": 0.0}
     n_steps = 0
     n_samples = 0
+    # Gradient diagnostics (pre-clip norm captured each step)
+    grad_norm_sum = 0.0
+    grad_norm_max = 0.0
+    n_clipped = 0
+    clip_thresh = cfg.grad_clip_norm if (cfg.grad_clip_norm is not None and cfg.grad_clip_norm > 0) else None
 
     for _epoch in range(cfg.local_epochs):
         for batch in loader:
@@ -97,8 +102,18 @@ def local_train(
 
             optim.zero_grad(set_to_none=True)
             loss.backward()
-            if cfg.grad_clip_norm is not None and cfg.grad_clip_norm > 0:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip_norm)
+            # clip_grad_norm_ returns the *pre-clip* total L2 norm regardless of
+            # whether clipping fires; pass +inf when disabled so the no-op path
+            # still gives us the norm for logging.
+            pre_clip_norm = float(torch.nn.utils.clip_grad_norm_(
+                model.parameters(),
+                clip_thresh if clip_thresh is not None else float("inf"),
+            ).item())
+            grad_norm_sum += pre_clip_norm
+            if pre_clip_norm > grad_norm_max:
+                grad_norm_max = pre_clip_norm
+            if clip_thresh is not None and pre_clip_norm > clip_thresh:
+                n_clipped += 1
             optim.step()
 
             # Sample-weighted accumulation
@@ -121,5 +136,9 @@ def local_train(
         "n_samples": n_samples,
         "lr_backbone": optim.param_groups[0]["lr"],
         "lr_head":     optim.param_groups[1]["lr"],
+        "grad_norm_mean":      (grad_norm_sum / n_steps) if n_steps else 0.0,
+        "grad_norm_max":       grad_norm_max,
+        "grad_clip_threshold": clip_thresh,
+        "grad_clip_frac":      (n_clipped / n_steps) if (n_steps and clip_thresh is not None) else 0.0,
     })
     return means
