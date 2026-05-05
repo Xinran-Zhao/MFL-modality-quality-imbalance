@@ -4,3 +4,5 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 .env
+runs/
+slurm/logs/
