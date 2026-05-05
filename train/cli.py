@@ -92,6 +92,10 @@ def build_argparser() -> argparse.ArgumentParser:
     p.add_argument("--num-workers", type=int, default=4)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--output-dir", default=str(REPO_ROOT / "runs"))
+    p.add_argument("--run-subdir", default=None,
+                   help="Override the per-scenario output subdir under --output-dir. "
+                        "Default is the scenario name (e.g., 's1_33_67'). For multi-seed "
+                        "sweeps, set to e.g. 's1_33_67/seed_42'.")
     p.add_argument("--dry-run", action="store_true",
                    help="1 round, 4 batches/client, no test, no eval-loader workers.")
     return p
@@ -131,7 +135,8 @@ def run_scenario(args: argparse.Namespace, scenario: str, device: torch.device) 
         partition_root=args.partition_root,
         scenario=scenario,
     )
-    out_dir = Path(args.output_dir) / scenario
+    subdir = args.run_subdir if args.run_subdir is not None else scenario
+    out_dir = Path(args.output_dir) / subdir
 
     # ---- tokenizer + loaders ----
     tokenizer = make_tokenizer(text_backbone=args.text_backbone)
@@ -254,6 +259,12 @@ def main(argv=None) -> int:
     set_seed(args.seed)
 
     scenarios = resolve_scenarios(args.scenario)
+    if args.run_subdir is not None and len(scenarios) > 1:
+        raise SystemExit(
+            "--run-subdir is only valid with a single --scenario; got "
+            f"{scenarios}. (When sweeping multiple scenarios in one process, "
+            "let each scenario use its own default subdir.)"
+        )
     print(f"Running scenarios: {scenarios}", flush=True)
 
     summary = {}
