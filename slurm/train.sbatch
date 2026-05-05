@@ -66,9 +66,16 @@ CONDA_ENV="${CONDA_ENV:-/scratch/$USER/.conda/envs/multimodal-fl}"
 cd "$REPO_DIR"
 mkdir -p slurm/logs "$OUTPUT_DIR/$RUN_SUBDIR"
 
-# Activate conda env (handles common Sol/conda layouts)
-if   [ -f "/packages/apps/anaconda3/etc/profile.d/conda.sh" ]; then source /packages/apps/anaconda3/etc/profile.d/conda.sh
-elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ];          then source "$HOME/miniconda3/etc/profile.d/conda.sh"
+# Activate conda env. Sol auto-loads `mamba/latest`, putting `conda` on PATH,
+# but the shell function `conda activate` requires sourcing conda.sh first.
+# Discover conda.sh from the active conda binary; fall back to the known path.
+CONDA_BASE="$(conda info --base 2>/dev/null || true)"
+if [ -n "$CONDA_BASE" ] && [ -f "$CONDA_BASE/etc/profile.d/conda.sh" ]; then
+    source "$CONDA_BASE/etc/profile.d/conda.sh"
+elif [ -f "/packages/apps/mamba/2.0.8/etc/profile.d/conda.sh" ]; then
+    source /packages/apps/mamba/2.0.8/etc/profile.d/conda.sh
+elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+    source "$HOME/miniconda3/etc/profile.d/conda.sh"
 fi
 conda activate "$CONDA_ENV"
 export PYTHONNOUSERSITE=1                       # ignore stale ~/.local packages
