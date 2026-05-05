@@ -90,3 +90,50 @@ scancel <jobid>          # kill all 15
 scancel <jobid>_7        # kill only task 7 (s2 seed=43)
 scancel <jobid>_[1-5]    # kill all of s1
 ```
+
+---
+
+## `train_stripped.sbatch` — lexical-strip ablation (1 scenario x 5 seeds)
+
+Runs the same trainer / partitions / seeds as `train.sbatch`, but with a
+`prepared_data_stripped.csv` whose `findings_text` has had the 7 disease
+label words (and clinical synonyms) replaced by `[DEIDENTIFIED]`. This
+measures the **post-leakage multimodal AUROC ceiling** so cross-design
+comparisons (lambda sweep, modality-dropout sweep) become interpretable.
+
+### Generate the stripped CSV first
+
+```bash
+python -m data_partition.strip_label_words \
+    --in  /data/amciilab/xinran/indiana_cxr/prepared/prepared_data.csv \
+    --out /data/amciilab/xinran/indiana_cxr/prepared/prepared_data_stripped.csv
+```
+
+Verifies down to **0%** label-word presence in `findings_text` for all 7
+positive subsets.
+
+### Submit
+
+```bash
+# default: s2_50_50, 5 seeds
+sbatch slurm/train_stripped.sbatch
+
+# different scenario
+SCENARIO=s3_67_33 sbatch slurm/train_stripped.sbatch
+
+# tag the run
+RUN_TAG=stripped_diag sbatch slurm/train_stripped.sbatch
+```
+
+### Compare
+
+```bash
+# original (leaky) and stripped runs in one table
+python -m analysis.aggregate_seeds runs/baseline_20260505
+python -m analysis.aggregate_seeds runs/stripped_<jobid>
+```
+
+If the stripped MM AUROC drops sharply (e.g. 0.98 -> 0.85) while IM AUROC
+barely moves, the leakage explanation is confirmed and the stripped MM
+AUROC becomes the meaningful baseline for the upcoming `lambda` and
+`modality_dropout` sweeps.
