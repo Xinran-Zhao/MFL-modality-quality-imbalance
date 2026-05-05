@@ -1,0 +1,44 @@
+{
+  "source_csv": "/data/amciilab/xinran/indiana_cxr/prepared/prepared_data.csv",
+  "image_root": "/data/amciilab/xinran/indiana_cxr/images",
+  "paired_only": true,
+  "dedup_by_uid": true,
+  "total_pool_after_filter": 3666,
+  "val_frac": 0.15,
+  "test_frac": 0.15,
+  "seed": 42,
+  "n_val": 552,
+  "n_test": 536,
+  "label_names": [
+    "No_Finding",
+    "Cardiomegaly",
+    "Atelectasis",
+    "Pleural_Effusion",
+    "Opacity",
+    "Calcinosis",
+    "Calcified_Granuloma",
+    "Airspace_Disease"
+  ],
+  "label_counts_val": {
+    "No_Finding": 198,
+    "Cardiomegaly": 47,
+    "Atelectasis": 45,
+    "Pleural_Effusion": 20,
+    "Opacity": 62,
+    "Calcinosis": 40,
+    "Calcified_Granuloma": 38,
+    "Airspace_Disease": 16
+  },
+  "label_counts_test": {
+    "No_Finding": 198,
+    "Cardiomegaly": 42,
+    "Atelectasis": 39,
+    "Pleural_Effusion": 16,
+    "Opacity": 55,
+    "Calcinosis": 36,
+    "Calcified_Granuloma": 36,
+    "Airspace_Disease": 10
+  },
+  "eval_protocol": "Same val/test uids evaluated under TWO modality conditions: (a) multimodal (image+text), (b) image-only (text masked).",
+  "num_clients": 2
+}

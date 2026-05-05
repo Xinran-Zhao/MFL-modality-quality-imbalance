@@ -1,0 +1,10 @@
+{
+  "client_0": {
+    "image": true,
+    "text": true
+  },
+  "client_1": {
+    "image": true,
+    "text": false
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "scenario": "s2_50_50",
+  "client_ratios": [
+    0.5,
+    0.5
+  ],
+  "seed": 44,
+  "num_clients": 2,
+  "label_names": [
+    "No_Finding",
+    "Cardiomegaly",
+    "Atelectasis",
+    "Pleural_Effusion",
+    "Opacity",
+    "Calcinosis",
+    "Calcified_Granuloma",
+    "Airspace_Disease"
+  ],
+  "note": "partition.json contains TRAIN-ONLY uids per client. Val/test live in ../_global_eval.json.",
+  "clients": {
+    "client_0": {
+      "n_train": 1305,
+      "label_counts_train": {
+        "No_Finding": 462,
+        "Cardiomegaly": 122,
+        "Atelectasis": 115,
+        "Pleural_Effusion": 58,
+        "Opacity": 154,
+        "Calcinosis": 107,
+        "Calcified_Granuloma": 95,
+        "Airspace_Disease": 47
+      }
+    },
+    "client_1": {
+      "n_train": 1273,
+      "label_counts_train": {
+        "No_Finding": 462,
+        "Cardiomegaly": 108,
+        "Atelectasis": 96,
+        "Pleural_Effusion": 44,
+        "Opacity": 138,
+        "Calcinosis": 97,
+        "Calcified_Granuloma": 87,
+        "Airspace_Disease": 35
+      }
+    }
+  }
+}
