@@ -26,7 +26,7 @@
 
 #SBATCH --job-name=mfl_fedavg
 #SBATCH --array=1-15
-#SBATCH --partition=general
+#SBATCH --partition=public
 #SBATCH --qos=public
 #SBATCH --gres=gpu:a100:1            # change to gpu:1 for any-GPU, or gpu:v100:1
 #SBATCH --cpus-per-task=4
