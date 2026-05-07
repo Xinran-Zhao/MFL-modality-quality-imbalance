@@ -106,8 +106,8 @@ srun python -m train.cli \
     --eval-batch-size 32 \
     --lr-backbone 1e-5 \
     --lr-head 1e-4 \
-    --lambda-final 0.5 \
-    --lambda-warmup-rounds 10 \
+    --lambda-final 1.0 \
+    --lambda-warmup-rounds 0 \
     --modality-dropout-p 0.15
 
 echo "Task $TASK ($SCENARIO seed=$SEED) finished at $(date)"

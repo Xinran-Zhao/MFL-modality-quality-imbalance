@@ -84,8 +84,9 @@ def build_argparser() -> argparse.ArgumentParser:
     p.add_argument("--lr-head", type=float, default=1e-4)
     p.add_argument("--weight-decay", type=float, default=0.01)
     p.add_argument("--grad-clip", type=float, default=1.0)
-    p.add_argument("--lambda-final", type=float, default=0.5)
-    p.add_argument("--lambda-warmup-rounds", type=int, default=10)
+    p.add_argument("--lambda-final", type=float, default=1.0)
+    p.add_argument("--lambda-warmup-rounds", type=int, default=0,
+                   help="0 disables warmup -- lambda is held at lambda_final from round 0.")
 
     # ---- runtime ----
     p.add_argument("--device", default="auto", help="auto | cuda | cpu")
